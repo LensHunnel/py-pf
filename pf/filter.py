@@ -28,11 +28,24 @@ __all__ = ['PacketFilter']
 
 
 # ioctl() operations
-IOCPARM_MASK     = 0x1fff
+IOCPARM_SHIFT    = 13 #/* number of bits for ioctl size */
+IOCPARM_MASK     = ((1 << IOCPARM_SHIFT) - 1) #/* parameter length mask */
+IOCPARM_MAX	     = (1 << IOCPARM_SHIFT)
 IOC_VOID         = 0x20000000
 IOC_OUT          = 0x40000000
 IOC_IN           = 0x80000000
 IOC_INOUT        = IOC_IN | IOC_OUT
+IOC_DIRMASK	     = IOC_VOID|IOC_OUT|IOC_IN
+
+
+def IOCPARM_LEN(x):
+    return ((x) >> 16) & IOCPARM_MASK
+
+def IOCBASECMD(x):
+    return (x) & ~(IOCPARM_MASK << 16)
+
+def IOCGROUP(x):
+    return ((x) >> 8) & 0xff
 
 def _IOC(inout, group, num, len):
     return (inout | ((len & IOCPARM_MASK) << 16) | ((group) << 8) | (num))
@@ -42,6 +55,7 @@ def _IO(group, num):
 
 def _IOWR(group, num, type):
     return _IOC(IOC_INOUT, ord(group), num, sizeof(type))
+
 
 DIOCSTART        = _IO  ('D',  1)
 DIOCSTOP         = _IO  ('D',  2)
