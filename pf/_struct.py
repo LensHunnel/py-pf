@@ -48,8 +48,8 @@ __all__ = ['timeval',
 
 # Constants
 IFNAMSIZ             = 16               # From /usr/include/net/if.h
-PFRES_MAX            = 17               # From /usr/include/net/pfvar.h
-LCNT_MAX             = 10               # From /usr/include/net/pfvar.h
+PFRES_MAX            = 15               # From /usr/include/net/pfvar.h
+LCNT_MAX             = 7               # From /usr/include/net/pfvar.h
 FCNT_MAX             = 3                # From /usr/include/net/pfvar.h
 SCNT_MAX             = 3                # From /usr/include/net/pfvar.h
 PF_MD5_DIGEST_LENGTH = 16               # From /usr/include/net/pfvar.h
@@ -57,7 +57,7 @@ PF_TABLE_NAME_SIZE   = 32               # From /usr/include/net/pfvar.h
 PF_RULE_LABEL_SIZE   = 64               # From /usr/include/net/pfvar.h
 PF_QNAME_SIZE        = 64               # From /usr/include/net/pfvar.h
 PF_TAG_NAME_SIZE     = 64               # From /usr/include/net/pfvar.h
-PF_SKIP_COUNT        = 9                # From /usr/include/net/pfvar.h
+PF_SKIP_COUNT        = 8                # From /usr/include/net/pfvar.h
 RTLABEL_LEN          = 32               # From /usr/include/net/route.h
 PATH_MAX             = 1024             # From /usr/include/sys/syslimits.h
 
@@ -79,19 +79,12 @@ class pf_status(Structure):       # From /usr/include/net/pfvar.h
                 ("scounters",         c_uint64 * SCNT_MAX),
                 ("pcounters",         c_uint64 * 3 * 2 * 2),
                 ("bcounters",         c_uint64 * 2 * 2),
-                ("stateid",           c_uint64),
-                ("syncookies_inflight", c_uint64 * 2),
                 ("since",             c_int64),       # time_t
                 ("running",           c_uint32),
                 ("states",            c_uint32),
-                ("states_halfopen",   c_uint32),
                 ("src_nodes",         c_uint32),
                 ("debug",             c_uint32),
                 ("hostid",            c_uint32),
-                ("reass",             c_uint32),
-                ("syncookies_active", c_uint8),
-                ("syncookies_mode",   c_uint8),
-                ("pad",               c_uint8 * 2),
                 ("ifname",            c_char * IFNAMSIZ),
                 ("pf_chksum",         c_uint8 * PF_MD5_DIGEST_LENGTH)]
 
@@ -116,9 +109,8 @@ class pf_addr_wrap(Structure):          # From /usr/include/net/pfvar.h
 
         _fields_ = [("a",             _a),
                     ("ifname",        c_char * IFNAMSIZ),
-                    ("tblname",       c_char * PF_TABLE_NAME_SIZE),
-                    ("rtlabelname",   c_char * RTLABEL_LEN),
-                    ("rtlabel",       c_uint32)]
+                    ("tblname",       c_char * PF_TABLE_NAME_SIZE)
+                    ]
 
     class _p(Union):
         _fields_ = [("dyn",           c_void_p),      # (struct pfi_dynaddr *)
@@ -161,10 +153,8 @@ class pfsync_state_peer(Structure):     # From /usr/include/net/pfvar.h
 
 class pfsync_state_key(Structure):      # From /usr/include/net/pfvar.h
     _fields_ = [("addr",              pf_addr * 2),
-                ("port",              c_uint16 * 2),
-                ("rdomain",           c_uint16),
-                ("af",                c_uint8),       # sa_family_t
-                ("pad",               c_uint8)]
+                ("port",              c_uint16 * 2)
+                ]
 
 
 class pfsync_state(Structure):          # From /usr/include/net/pfvar.h
@@ -182,20 +172,15 @@ class pfsync_state(Structure):          # From /usr/include/net/pfvar.h
                 ("packets",           c_uint32 * 2 * 2),
                 ("bytes",             c_uint32 * 2 * 2),
                 ("creatorid",         c_uint32),
-                ("rtableid",          c_int32 * 2),
-                ("max_mss",           c_uint16),
                 ("af",                c_uint8),       # sa_family_t
                 ("proto",             c_uint8),
                 ("direction",         c_uint8),
+                ("__spare",           c_uint8 * 2),
                 ("log",               c_uint8),
-                ("rt",                c_uint8),
+                ("state_flags",       c_uint8),
                 ("timeout",           c_uint8),
                 ("sync_flags",        c_uint8),
-                ("updates",           c_uint8),
-                ("min_ttl",           c_uint8),
-                ("set_tos",           c_uint8),
-                ("state_flags",       c_uint16),
-                ("set_prio",          c_uint8 * 2)]
+                ("updates",           c_uint8)]
 
 
 class pfioc_states(Structure):    # From /usr/include/net/pfvar.h
